@@ -1,4 +1,4 @@
-import { Car } from "./Car";
+import { Car, magnitude } from "./Car";
 import { Race } from "./Race";
 
 export default function ({ cars, race }: { cars: Car[]; race: Race }) {
@@ -7,15 +7,16 @@ export default function ({ cars, race }: { cars: Car[]; race: Race }) {
       <h1 className="text-white">{race.name}</h1>
 
       {cars
-        .sort((a, b) => b.progress - a.progress)
+        .sort((a, b) => b.distanceTraveled - a.distanceTraveled)
         .map((car) => (
           <div className="text-white border-white border-1 p-3" key={car.id}>
             {car.name} <br />
-            Speed: {car.velocity.x}, {car.velocity.y} <br />
-            X: {Math.round(car.pos.x)}, Y: {Math.round(car.pos.y)} <br />
+            Speed: {(magnitude(car.velocity) * 1000).toFixed(1)} <br />
+            Max Speed: {(car.maxSpeed * 1000).toFixed(1)} <br />
+            Distance: {Math.round(car.distanceTraveled)} <br />
+            Acceleration: {car.accelFactor.toFixed(2)}x <br />
+            Drag: {car.dragFactor.toFixed(2)}x <br />
             Laps: {car.laps} / {race.laps}
-            <br />
-            Progress: {car.progress.toFixed(2)}
           </div>
         ))}
     </div>

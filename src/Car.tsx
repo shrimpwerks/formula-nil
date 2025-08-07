@@ -1,5 +1,3 @@
-import { interpolate } from "./Map";
-
 export interface Vector2D {
   x: number;
   y: number;
@@ -14,9 +12,12 @@ export interface Car {
   pos: Vector2D;
   velocity: Vector2D;
   accelFactor: number;
+  maxSpeed: number;
+  dragFactor: number;
+  segmentIdx: number;
 
-  progress: number;
   laps: number;
+  distanceTraveled: number;
 }
 
 export const names: string[] = [
@@ -37,83 +38,115 @@ export function randomSpeed(): number {
   return 0.0008 + Math.random() * 0.0004;
 }
 
-export function estimateTrackLength(points: Vector2D[]): number {
-  let length = 0;
-  for (let i = 0; i < points.length; i++) {
-    const a = points[i];
-    const b = points[(i + 1) % points.length]; // wrap
-    length += Math.hypot(b.x - a.x, b.y - a.y);
-  }
-  return length;
+export function distance(a: Vector2D, b: Vector2D): number {
+  return Math.hypot(b.x - a.x, b.y - a.y);
 }
 
+export function magnitude(vector: Vector2D): number {
+  return Math.hypot(vector.x, vector.y);
+}
+
+export function normalize(vector: Vector2D): Vector2D {
+  const mag = magnitude(vector);
+  if (mag === 0) return { x: 0, y: 0 };
+  return { x: vector.x / mag, y: vector.y / mag };
+}
+
+export function subtract(a: Vector2D, b: Vector2D): Vector2D {
+  return { x: a.x - b.x, y: a.y - b.y };
+}
+
+export function dot(a: Vector2D, b: Vector2D): number {
+  return a.x * b.x + a.y * b.y;
+}
+
+export function clampMagnitude(
+  vector: Vector2D,
+  maxMagnitude: number,
+): Vector2D {
+  const mag = magnitude(vector);
+  if (mag > maxMagnitude) {
+    return {
+      x: (vector.x / mag) * maxMagnitude,
+      y: (vector.y / mag) * maxMagnitude,
+    };
+  }
+  return vector;
+}
+
+/**
+ * Update one car given raw track vertices (no interpolation).
+ * ───────────────────────────────────────────────────────────
+ * Car fields required:
+ *   pos          : current world-space position   { x , y }
+ *   velocity     : current velocity vector        { x , y }
+ *   acceleration : last frame’s accel (for UI)    { x , y }
+ *   segmentIdx   : integer index of the *next* track point to aim at
+ *   accelFactor  : per-car throttle multiplier
+ *   distance     : optional – total pixels driven (for stats / progress UI)
+ */
 export function updateCar(trackPoints: Vector2D[], car: Car) {
-  /* ---------- 1 .  Where am I?  ---------- */
-  const currentPos = interpolate(trackPoints, car.progress);
+  /* ---------- 0. Bail-outs ---------- */
+  if (trackPoints.length < 2) return car; // need at least a segment
 
-  /* look-ahead tangent: a small ε further along the track */
-  const EPS = 1 / trackPoints.length; // ~one segment
-  const lookAheadP = Math.min(car.progress + EPS, 1);
-  const lookAhead = interpolate(trackPoints, lookAheadP);
+  const targetPt = trackPoints[car.segmentIdx]; // point to chase
+  const distanceToTarget = distance(car.pos, targetPt);
 
-  const dirDX = lookAhead.x - currentPos.x;
-  const dirDY = lookAhead.y - currentPos.y;
-  const dirLen = Math.hypot(dirDX, dirDY) || 1;
-  const trackDir = { x: dirDX / dirLen, y: dirDY / dirLen };
+  /* ---------- 1.  If we've reached the target, switch to the next ---------- */
+  const REACHED_EPS = 1; // pixels tolerance
+  let nextSegmentIdx = car.segmentIdx;
 
-  /* ---------- 2 .  Build acceleration ---------- */
-  const velocityMag = Math.hypot(car.velocity.x, car.velocity.y);
-  const velocityDir =
-    velocityMag === 0
-      ? trackDir
-      : {
-          x: car.velocity.x / velocityMag,
-          y: car.velocity.y / velocityMag,
-        };
+  if (distanceToTarget <= REACHED_EPS) {
+    // Pick the following vertex (wrap for closed loop, clamp for open track)
+    nextSegmentIdx =
+      car.segmentIdx + 1 < trackPoints.length
+        ? car.segmentIdx + 1
+        : trackPoints.length - 1; // clamp at end
+  }
 
-  const dot = velocityDir.x * trackDir.x + velocityDir.y * trackDir.y; // –1 → 1
-  const penalty = Math.max(0, 1 - dot); // 0 (aligned) … 2 (reverse)
+  // Re-compute direction with (possibly) new target
+  const target = trackPoints[nextSegmentIdx];
+  const directionVector = subtract(target, car.pos);
+  const trackDir = normalize(directionVector);
 
-  const BASE_ACCEL = 0.0006; // throttle per frame
-  const accelTarget = BASE_ACCEL * (car.accelFactor ?? 1);
-  const accelStrength = accelTarget * (1 - 0.5 * penalty); // lose up to 50 %
+  /* ---------- 2.  Acceleration & steering penalty ---------- */
+  const velMag = magnitude(car.velocity);
+  const velDir = velMag === 0 ? trackDir : normalize(car.velocity);
+
+  const alignmentDot = dot(velDir, trackDir);
+  const penalty = Math.max(0, 1 - alignmentDot); // 0 (aligned) … 2 (reverse)
+
+  const BASE_ACCEL = 0.0006;
+  const accel = BASE_ACCEL * (car.accelFactor ?? 1) * (1 - 0.5 * penalty);
 
   const acceleration = {
-    x: trackDir.x * accelStrength,
-    y: trackDir.y * accelStrength,
+    x: trackDir.x * accel,
+    y: trackDir.y * accel,
   };
 
-  /* ---------- 3 .  Update velocity ---------- */
-  let newVelocity = {
+  /* ---------- 3.  Velocity integration + drag ---------- */
+  const DRAG_K = 0.005 * car.dragFactor;
+  let newVel = {
     x: car.velocity.x + acceleration.x,
     y: car.velocity.y + acceleration.y,
   };
+  newVel.x -= newVel.x * DRAG_K * penalty;
+  newVel.y -= newVel.y * DRAG_K * penalty;
 
-  /* extra drag when steering hard */
-  const DRAG_K = 0.005;
-  newVelocity.x -= newVelocity.x * DRAG_K * penalty;
-  newVelocity.y -= newVelocity.y * DRAG_K * penalty;
+  newVel = clampMagnitude(newVel, car.maxSpeed);
 
-  /* clamp speed */
-  const maxVel = 0.02;
-  const newVelMag = Math.hypot(newVelocity.x, newVelocity.y);
-  if (newVelMag > maxVel) {
-    newVelocity.x = (newVelocity.x / newVelMag) * maxVel;
-    newVelocity.y = (newVelocity.y / newVelMag) * maxVel;
-  }
+  /* ---------- 4.  Position & distance ---------- */
+  const newPos = { x: car.pos.x + newVel.x, y: car.pos.y + newVel.y };
+  const distanceThisFrame = distance(car.pos, newPos);
+  const newDistanceTraveled = car.distanceTraveled + distanceThisFrame;
 
-  /* ---------- 4 .  Advance progress using *new* velocity ---------- */
-  const trackLength = estimateTrackLength(trackPoints); // cache outside loop if you like
-  const progressDelta = newVelMag / trackLength; // pixels → progress
-  const newProgress = Math.min(car.progress + progressDelta, 1);
-  const nextPos = interpolate(trackPoints, newProgress);
-
-  /* ---------- 5 .  Return updated car ---------- */
+  /* ---------- 5.  Return updated car ---------- */
   return {
     ...car,
-    progress: newProgress,
-    velocity: newVelocity,
+    pos: newPos,
+    velocity: newVel,
     acceleration: acceleration,
-    pos: nextPos,
+    segmentIdx: nextSegmentIdx, // advance when point reached
+    distanceTraveled: newDistanceTraveled,
   };
 }

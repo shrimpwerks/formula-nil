@@ -1,37 +1,49 @@
 import { useCallback, useState, useEffect, useRef } from "react";
 import { Application, Graphics, Point, Color, Text } from "pixi.js";
-import { generateTrackPoints, generateTrackPointsV2 } from "./Track";
+import { generateTrackPoints } from "./Track";
 import { Car } from "./Car";
 import { Race } from "./Race";
-import { Vector2D, updateCar, estimateTrackLength } from "./Car";
+import { Vector2D, updateCar } from "./Car";
+
+function extendSegmentEnd(
+  p1: Vector2D,
+  p2: Vector2D,
+  extension: number,
+): Vector2D {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const length = Math.sqrt(dx * dx + dy * dy);
+
+  const newX2 = p2.x + (dx / length) * extension;
+  const newY2 = p2.y + (dy / length) * extension;
+
+  return { x: newX2, y: newY2 };
+}
 
 export default function Map({
   race,
   cars,
   setCars,
+  onTrackGenerated,
 }: {
   race: Race;
   cars: Car[];
   setCars: React.Dispatch<React.SetStateAction<Car[]>>;
+  onTrackGenerated: (trackPoints: { x: number; y: number }[]) => void;
 }) {
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-
-  // Track dimensions - keeping original size for generation
-  const trackWidth = 600;
-  const trackHeight = 400;
-  const centerX = trackWidth / 2;
-  const centerY = trackHeight / 2;
-  const radius = Math.min(trackWidth, trackHeight) / 3;
 
   const [trackPoints, setTrackPoints] = useState<Vector2D[]>([]);
   const pixiAppRef = useRef<Application | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Generate track points once
-  const generateTrack = useCallback(() => {
-    return generateTrackPoints(centerX, centerY, radius);
-  }, [centerX, centerY, radius]);
+  // Track dimensions - keeping original size for generation (constants)
+  const trackWidth = 600;
+  const trackHeight = 400;
+  const centerX = trackWidth / 2;
+  const centerY = trackHeight / 2;
+  const radius = Math.min(trackWidth, trackHeight) / 3;
 
   // Calculate responsive canvas size and track positioning
   const updateCanvasSize = useCallback(() => {
@@ -119,11 +131,14 @@ export default function Map({
     };
   }, [updateCanvasSize]);
 
-  // Initialize track and cars
+  // Initialize track and cars - run only once
   useEffect(() => {
-    const points = generateTrack();
+    const points = generateTrackPoints(centerX, centerY, radius);
     setTrackPoints(points);
-  }, [generateTrack]);
+    // Convert Point objects to simple {x, y} objects and initialize cars
+    const simplePoints = points.map((p) => ({ x: p.x, y: p.y }));
+    onTrackGenerated(simplePoints);
+  }, []); // Empty dependency array - run only once
 
   // Render function with scaling and centering
   const render = useCallback(() => {
@@ -157,7 +172,11 @@ export default function Map({
         },
       });
 
-      const tooltipPos = drawLine({ x: centerX, y: centerY }, car.pos, 50);
+      const tooltipPos = extendSegmentEnd(
+        { x: centerX, y: centerY },
+        car.pos,
+        50,
+      );
 
       // Position tooltip next to car (offset right and up)
       tooltip.x = tooltipPos.x;
@@ -174,21 +193,8 @@ export default function Map({
     });
   }, [trackPoints, cars, scale, offset]);
 
-  function drawLine(p1: Vector2D, p2: Vector2D, extension: number): Vector2D {
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
-    const length = Math.sqrt(dx * dx + dy * dy);
-
-    const newX2 = p2.x + (dx / length) * extension;
-    const newY2 = p2.y + (dy / length) * extension;
-
-    return { x: newX2, y: newY2 };
-  }
-
   useEffect(() => {
     if (trackPoints.length === 0 || !pixiAppRef.current) return;
-
-    const trackLength = estimateTrackLength(trackPoints); // compute once per effect
 
     const interval = setInterval(() => {
       setCars((prevCars) =>
@@ -199,7 +205,7 @@ export default function Map({
     }, 16);
 
     return () => clearInterval(interval);
-  }, [trackPoints, interpolate]);
+  }, [trackPoints]);
 
   // Render when cars or track changes
   useEffect(() => {
@@ -207,26 +213,4 @@ export default function Map({
   }, [render]);
 
   return <div ref={containerRef} />;
-}
-
-export function interpolate(points: Vector2D[], t: number): Vector2D {
-  const n = points.length;
-  if (n === 0) return { x: 0, y: 0 };
-  if (n === 1) return points[0];
-
-  // Clamp t to [0, 1]
-  t = Math.max(0, Math.min(1, t));
-
-  // There are (n-1) segments in an open track
-  const scaled = t * (n - 1);
-  const i = Math.floor(scaled);
-  const frac = scaled - i;
-
-  const p1 = points[i];
-  const p2 = points[i + 1] ?? points[i]; // use p1 at the very end
-
-  return {
-    x: p1.x + (p2.x - p1.x) * frac,
-    y: p1.y + (p2.y - p1.y) * frac,
-  };
 }
