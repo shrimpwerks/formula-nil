@@ -52,27 +52,49 @@ export function newCar(id: number, driver: Driver, startingPos: Vector2D): Car {
   };
 }
 
-export function updateCar(trackPoints: Vector2D[], car: Car) {
-  if (trackPoints.length < 2) return car;
-
-  const targetPt = trackPoints[car.segmentIdx];
-  const distanceToTarget = car.pos.distanceTo(targetPt);
-
-  const REACHED_EPS = 5;
-  let nextSegmentIdx = car.segmentIdx;
-
-  if (distanceToTarget <= REACHED_EPS) {
-    nextSegmentIdx =
-      car.segmentIdx + 1 < trackPoints.length
-        ? car.segmentIdx + 1
-        : trackPoints.length - 1;
+export function selectCarTarget(
+  trackPoints: Vector2D[],
+  car: Car,
+): {
+  target: Vector2D;
+  nextSegmentIdx: number;
+  distanceToTarget: number;
+} {
+  if (trackPoints.length < 2) {
+    return {
+      target: car.pos,
+      nextSegmentIdx: car.segmentIdx,
+      distanceToTarget: 0,
+    };
   }
 
+  const currentTarget = trackPoints[car.segmentIdx];
+  const distanceToTarget = car.pos.distanceTo(currentTarget);
+
+  const REACHED_EPS = 5;
+  const nextSegmentIdx =
+    distanceToTarget <= REACHED_EPS
+      ? Math.min(car.segmentIdx + 1, trackPoints.length - 1)
+      : car.segmentIdx;
+
   const target = trackPoints[nextSegmentIdx];
+
+  return {
+    target,
+    nextSegmentIdx,
+    distanceToTarget,
+  };
+}
+
+export function updateCarWithTarget(
+  car: Car,
+  target: Vector2D,
+  distanceToTarget: number,
+  nextSegmentIdx: number,
+): Car {
   const directionVector = target.subtract(car.pos);
   const trackDir = directionVector.normalized();
 
-  /* ---------- Steering alignment ---------- */
   const velMag = car.velocity.length();
   const velDir = velMag === 0 ? trackDir : car.velocity.normalized();
   const alignmentDot = velDir.dot(trackDir);
@@ -90,24 +112,19 @@ export function updateCar(trackPoints: Vector2D[], car: Car) {
 
   const acceleration = trackDir.multiplyScalar(accel);
 
-  /* ---------- Adjust velocity to aggressively steer ---------- */
   const DRAG_K = 0.05 * car.dragFactor;
   let newVel = car.velocity.add(acceleration);
 
-  // --- Strongly steer towards trackDir
-  const STEERING_GAIN = 0.2; // Increase for sharper turns (try 0.2–0.5)
+  const STEERING_GAIN = 0.2;
   newVel.x += (trackDir.x * velMag - newVel.x) * STEERING_GAIN;
   newVel.y += (trackDir.y * velMag - newVel.y) * STEERING_GAIN;
 
-  // Apply drag with penalty
   newVel.x -= newVel.x * DRAG_K * penalty;
   newVel.y -= newVel.y * DRAG_K * penalty;
 
   newVel = newVel.limitLength(car.maxSpeed);
 
-  /* ---------- Update position ---------- */
   const newPos = car.pos.add(newVel);
-
   const distanceThisFrame = car.pos.distanceTo(newPos);
   const newDistanceTraveled = car.distanceTraveled + distanceThisFrame;
 
@@ -115,8 +132,16 @@ export function updateCar(trackPoints: Vector2D[], car: Car) {
     ...car,
     pos: newPos,
     velocity: newVel,
-    acceleration: acceleration,
+    acceleration,
     segmentIdx: nextSegmentIdx,
     distanceTraveled: newDistanceTraveled,
   };
+}
+
+export function updateCar(trackPoints: Vector2D[], car: Car): Car {
+  const { target, nextSegmentIdx, distanceToTarget } = selectCarTarget(
+    trackPoints,
+    car,
+  );
+  return updateCarWithTarget(car, target, distanceToTarget, nextSegmentIdx);
 }
