@@ -1,12 +1,12 @@
 import { Point } from "pixi.js";
-import { Vector2D } from "./Car";
+import { Vector2D } from "./Vector2D";
 
 export function generateTrackPoints(
   centerX: number,
   centerY: number,
   radius: number,
-): Point[] {
-  const points: Point[] = [];
+): Vector2D[] {
+  const points: Vector2D[] = [];
 
   // Create characteristic F1 track features
   const trackFeatures = [
@@ -36,7 +36,7 @@ export function generateTrackPoints(
 
     const x = centerX + Math.cos(randomAngle) * randomRadius;
     const y = centerY + Math.sin(randomAngle) * randomRadius;
-    points.push(new Point(x, y));
+    points.push(new Vector2D(x, y));
 
     // Add intermediate points for smoother curves with randomness
     if (i < trackFeatures.length - 1) {
@@ -50,7 +50,7 @@ export function generateTrackPoints(
 
       const midX = centerX + Math.cos(midAngle) * finalMidRadius;
       const midY = centerY + Math.sin(midAngle) * finalMidRadius;
-      points.push(new Point(midX, midY));
+      points.push(new Vector2D(midX, midY));
     }
   });
 
@@ -59,10 +59,7 @@ export function generateTrackPoints(
   return points;
 }
 
-function interpolateCatmullRom(
-  points: Vector2D[],
-  resolution = 10,
-): Vector2D[] {
+function interpolateCatmullRom(points: Vector2D[], resolution = 10) {
   const smooth = [];
 
   for (let i = 0; i < points.length; i++) {
@@ -117,7 +114,7 @@ function getOffsetPoints(points: string | any[], offset: number): Vector2D[] {
     const ox = Math.cos(angle + Math.PI / 2) * offset;
     const oy = Math.sin(angle + Math.PI / 2) * offset;
 
-    offsetPoints.push({ x: p2.x + ox, y: p2.y + oy });
+    offsetPoints.push(new Vector2D(p2.x + ox, p2.y + oy));
   }
 
   return offsetPoints;
@@ -128,17 +125,19 @@ function generateControlPoints(
   centerY: number,
   count: number,
   radius: number,
-): Vector2D[] {
+) {
   const points = [];
   const angleStep = (Math.PI * 2) / count;
 
   for (let i = 0; i < count; i++) {
     const angle = i * angleStep + Math.random() * angleStep * 0.5;
     const r = radius + Math.random() * 80 - 40;
-    points.push({
-      x: centerX + Math.cos(angle) * r,
-      y: centerY + Math.sin(angle) * r,
-    });
+    points.push(
+      new Vector2D(
+        centerX + Math.cos(angle) * r,
+        centerY + Math.sin(angle) * r,
+      ),
+    );
   }
 
   return points;
@@ -149,7 +148,7 @@ export function generateTrackPointsV2(
   centerY: number,
   numPoints = 16,
   radius = 250,
-): Vector2D[] {
+) {
   const rawPoints = generateControlPoints(centerX, centerY, numPoints, radius);
   return interpolateCatmullRom(rawPoints, 8);
 }

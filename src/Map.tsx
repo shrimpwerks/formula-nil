@@ -3,7 +3,8 @@ import { Application, Graphics, Point, Color, Text } from "pixi.js";
 import { generateTrackPoints } from "./Track";
 import { Car } from "./Car";
 import { Race } from "./Race";
-import { Vector2D, updateCar } from "./Car";
+import { updateCar } from "./Car";
+import { Vector2D } from "./Vector2D";
 
 function extendSegmentEnd(
   p1: Vector2D,
@@ -17,7 +18,7 @@ function extendSegmentEnd(
   const newX2 = p2.x + (dx / length) * extension;
   const newY2 = p2.y + (dy / length) * extension;
 
-  return { x: newX2, y: newY2 };
+  return new Vector2D(newX2, newY2);
 }
 
 export default function Map({
@@ -173,7 +174,7 @@ export default function Map({
       });
 
       const tooltipPos = extendSegmentEnd(
-        { x: centerX, y: centerY },
+        new Vector2D(centerX, centerY),
         car.pos,
         50,
       );
