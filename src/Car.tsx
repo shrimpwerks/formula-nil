@@ -5,10 +5,6 @@ export function randomColor(): number {
   return Math.floor(Math.random() * 0xffffff);
 }
 
-export function randomSpeed(): number {
-  return 0.0008 + Math.random() * 0.0004;
-}
-
 export interface Car {
   id: number;
   name: string;
@@ -23,7 +19,6 @@ export interface Car {
   segmentIdx: number;
   brakeForce: number;
 
-  laps: number;
   distanceTraveled: number;
 }
 
@@ -53,22 +48,10 @@ export function newCar(id: number, driver: Driver, startingPos: Vector2D): Car {
     dragFactor: 0.8 + Math.random() * 0.4,
     brakeForce: 0.5 + Math.random() * 0.5,
     segmentIdx: 1,
-    laps: 0,
     distanceTraveled: 0,
   };
 }
 
-/**
- * Update one car given raw track vertices (no interpolation).
- * ───────────────────────────────────────────────────────────
- * Car fields required:
- *   pos          : current world-space position   { x , y }
- *   velocity     : current velocity vector        { x , y }
- *   acceleration : last frame’s accel (for UI)    { x , y }
- *   segmentIdx   : integer index of the *next* track point to aim at
- *   accelFactor  : per-car throttle multiplier
- *   distance     : optional – total pixels driven (for stats / progress UI)
- */
 export function updateCar(trackPoints: Vector2D[], car: Car) {
   if (trackPoints.length < 2) return car;
 

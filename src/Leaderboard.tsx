@@ -17,7 +17,6 @@ export default function ({ cars, race }: { cars: Car[]; race: Race }) {
             Acceleration: {car.accelFactor.toFixed(2)}x <br />
             Drag: {car.dragFactor.toFixed(2)}x <br />
             Brake Force: {car.brakeForce.toFixed(2)}x <br />
-            Laps: {car.laps} / {race.laps}
           </div>
         ))}
     </div>

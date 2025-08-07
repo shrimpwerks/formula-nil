@@ -10,11 +10,10 @@ export default function () {
   const [cars, setCars] = useState<Car[]>([]);
   const race: Race = {
     name: "Portland International Raceway",
-    laps: 6,
   };
 
   // Initialize cars with track positions
-  const initializeCarsOnTrack = (trackPoints: { x: number; y: number }[]) => {
+  const initializeCarsOnTrack = (trackPoints: Vector2D[]) => {
     if (trackPoints.length === 0) return;
 
     const startPointIndex = 0; // All cars start at the first track point

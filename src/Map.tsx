@@ -4,22 +4,7 @@ import { generateTrackPoints } from "./Track";
 import { Car } from "./Car";
 import { Race } from "./Race";
 import { updateCar } from "./Car";
-import { Vector2D } from "./Vector2D";
-
-function extendSegmentEnd(
-  p1: Vector2D,
-  p2: Vector2D,
-  extension: number,
-): Vector2D {
-  const dx = p2.x - p1.x;
-  const dy = p2.y - p1.y;
-  const length = Math.sqrt(dx * dx + dy * dy);
-
-  const newX2 = p2.x + (dx / length) * extension;
-  const newY2 = p2.y + (dy / length) * extension;
-
-  return new Vector2D(newX2, newY2);
-}
+import { extendSegmentEnd, Vector2D } from "./Vector2D";
 
 export default function Map({
   race,
@@ -30,7 +15,7 @@ export default function Map({
   race: Race;
   cars: Car[];
   setCars: React.Dispatch<React.SetStateAction<Car[]>>;
-  onTrackGenerated: (trackPoints: { x: number; y: number }[]) => void;
+  onTrackGenerated: (trackPoints: Vector2D[]) => void;
 }) {
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -136,9 +121,7 @@ export default function Map({
   useEffect(() => {
     const points = generateTrackPoints(centerX, centerY, radius);
     setTrackPoints(points);
-    // Convert Point objects to simple {x, y} objects and initialize cars
-    const simplePoints = points.map((p) => ({ x: p.x, y: p.y }));
-    onTrackGenerated(simplePoints);
+    onTrackGenerated(points);
   }, []); // Empty dependency array - run only once
 
   // Render function with scaling and centering
@@ -184,13 +167,11 @@ export default function Map({
       tooltip.y = tooltipPos.y;
 
       // Draw car
-      if (car.laps < race.laps) {
-        const carGraphics = new Graphics();
-        carGraphics.circle(car.pos.x, car.pos.y, 6).fill(car.color);
+      const carGraphics = new Graphics();
+      carGraphics.circle(car.pos.x, car.pos.y, 6).fill(car.color);
 
-        app.stage.addChild(tooltip);
-        app.stage.addChild(carGraphics);
-      }
+      app.stage.addChild(tooltip);
+      app.stage.addChild(carGraphics);
     });
   }, [trackPoints, cars, scale, offset]);
 

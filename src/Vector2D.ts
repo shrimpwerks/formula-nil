@@ -57,4 +57,48 @@ export class Vector2D {
   subtract(b: Vector2D): Vector2D {
     return new Vector2D(this.x - b.x, this.y - b.y);
   }
+
+  static zero(): Vector2D {
+    return new Vector2D(0, 0);
+  }
+
+  project(orthogonal: Vector2D): Vector2D {
+    const dot = this.dot(orthogonal);
+    const mag = orthogonal.length();
+    return new Vector2D(dot / mag, dot / mag);
+  }
+
+  orthogonal(): Vector2D {
+    return new Vector2D(-this.y, this.x);
+  }
+
+  angleTo(other: Vector2D): number {
+    const dot = this.dot(other);
+    const mag = this.length() * other.length();
+    return Math.acos(dot / mag);
+  }
+
+  rotated(angle: number): Vector2D {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    return new Vector2D(
+      this.x * cos - this.y * sin,
+      this.x * sin + this.y * cos,
+    );
+  }
+}
+
+export function extendSegmentEnd(
+  p1: Vector2D,
+  p2: Vector2D,
+  extension: number,
+): Vector2D {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const length = Math.sqrt(dx * dx + dy * dy);
+
+  const newX2 = p2.x + (dx / length) * extension;
+  const newY2 = p2.y + (dy / length) * extension;
+
+  return new Vector2D(newX2, newY2);
 }
