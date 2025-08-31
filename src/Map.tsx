@@ -153,7 +153,7 @@ export default function Map({
         style: {
           fontSize: 10,
           fill: 0xffffff,
-          fontFamily: 'Arial',
+          fontFamily: "Arial",
           antialias: true,
         },
         resolution: 2, // Higher resolution for crisp text
@@ -168,6 +168,21 @@ export default function Map({
       // Position tooltip next to car (offset right and up)
       tooltip.x = tooltipPos.x;
       tooltip.y = tooltipPos.y;
+
+      // Draw faint grey line from car to tooltip
+      const lineGraphics = new Graphics();
+      lineGraphics.setStrokeStyle({ 
+        width: 1, 
+        color: new Color(0x808080), 
+        alpha: 0.3 
+      });
+      lineGraphics.moveTo(car.pos.x, car.pos.y);
+      
+      // Connect to the center-left of the tooltip text
+      const tooltipCenterY = tooltipPos.y + tooltip.height / 2;
+      lineGraphics.lineTo(tooltipPos.x, tooltipCenterY);
+      lineGraphics.stroke();
+      app.stage.addChild(lineGraphics);
 
       // Draw car as rectangle aligned to heading
       const carGraphics = new Graphics();
