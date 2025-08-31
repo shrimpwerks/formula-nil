@@ -79,7 +79,11 @@ function updateCarWithTarget(
   const accel = (car.accelFactor ?? 1) * (1 - 0.5 * penalty) * slowdownFactor;
   const acceleration = trackDir.multiplyScalar(accel);
 
-  const STEERING_GAIN = 0.2;
+  // Make steering inversely correlated to speed - faster cars turn slower
+  const baseSteeringGain = 0.3;
+  const speedFactor = Math.min(1, velMag / car.maxSpeed); // 0 to 1 based on speed
+  const STEERING_GAIN = baseSteeringGain * (1 - speedFactor * 0.7); // Reduce by up to 70% at max speed
+  
   let newVel = car.velocity.add(acceleration);
   newVel.x += (trackDir.x * velMag - newVel.x) * STEERING_GAIN;
   newVel.y += (trackDir.y * velMag - newVel.y) * STEERING_GAIN;
