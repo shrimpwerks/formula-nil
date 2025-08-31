@@ -3,15 +3,27 @@ import { Race } from "./Race";
 
 export default function ({ cars, race }: { cars: Car[]; race: Race }) {
   return (
-    <div className="flex flex-col gap-2 m-2">
+    <div className="flex flex-col gap-2">
       <h1 className="text-white">{race.name}</h1>
 
       {cars
         .sort((a, b) => b.distanceTraveled - a.distanceTraveled)
         .map((car, index) => (
-          <details className="text-white border-white border-1 p-3" key={car.id}>
-            <summary className="cursor-pointer">
-              #{index + 1} {car.name}
+          <details
+            className="text-white border-white border-1 p-1"
+            key={car.id}
+          >
+            <summary className="cursor-pointer flex items-center gap-2">
+              {car.image && (
+                <img
+                  src={`/images/${car.image}`}
+                  alt={car.name}
+                  className="w-12 h-12 object-cover"
+                />
+              )}
+              <span>
+                #{index + 1} {car.name} {car.surname}
+              </span>
             </summary>
             <div className="mt-2 ml-4">
               Speed: {(car.velocity.length() * 1000).toFixed(1)} <br />

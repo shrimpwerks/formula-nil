@@ -30,15 +30,19 @@ export default function () {
     <>
       <h1 className="text-white">Formula Nil</h1>
 
-      <div className="flex m-2">
-        <Map
-          race={race}
-          cars={cars}
-          setCars={setCars}
-          onTrackGenerated={initializeCarsOnTrack}
-        />
+      <div className="flex">
+        <div className="w-2/3">
+          <Map
+            race={race}
+            cars={cars}
+            setCars={setCars}
+            onTrackGenerated={initializeCarsOnTrack}
+          />
+        </div>
 
-        <Leaderboard race={race} cars={cars} />
+        <div className="w-1/3">
+          <Leaderboard race={race} cars={cars} />
+        </div>
       </div>
     </>
   );

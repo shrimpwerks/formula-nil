@@ -8,6 +8,8 @@ export function randomColor(): number {
 export interface Car {
   id: number;
   name: string;
+  surname: string;
+  image?: string;
   color: number;
 
   acceleration: Vector2D;
@@ -33,7 +35,7 @@ export function newCar(id: number, driver: Driver, startingPos: Vector2D): Car {
   const normalizedSpeed = (rawMaxSpeed - minSpeed) / speedRange;
 
   // Invert normalizedSpeed to compute accelFactor (higher speed → lower accel)
-  const BASE_ACCEL_FACTOR = 0.0005; // max accel factor for slowest car
+  const BASE_ACCEL_FACTOR = 0.5; // max accel factor for slowest car
   const accelFactor = BASE_ACCEL_FACTOR * (1 - normalizedSpeed);
 
   const dragFactor = 0.8 * Math.random();
@@ -42,6 +44,8 @@ export function newCar(id: number, driver: Driver, startingPos: Vector2D): Car {
   return {
     id: id,
     name: driver.name,
+    surname: driver.surname,
+    image: driver.image,
     acceleration: Vector2D.zero(),
     velocity: Vector2D.zero(),
     color: randomColor(),
@@ -83,7 +87,7 @@ function updateCarWithTarget(
   const baseSteeringGain = 0.3;
   const speedFactor = Math.min(1, velMag / car.maxSpeed); // 0 to 1 based on speed
   const STEERING_GAIN = baseSteeringGain * (1 - speedFactor * 0.7); // Reduce by up to 70% at max speed
-  
+
   let newVel = car.velocity.add(acceleration);
   newVel.x += (trackDir.x * velMag - newVel.x) * STEERING_GAIN;
   newVel.y += (trackDir.y * velMag - newVel.y) * STEERING_GAIN;

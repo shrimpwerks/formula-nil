@@ -6,10 +6,10 @@ export function generateTrackPoints(
   radius: number,
 ): Vector2D[] {
   const points: Vector2D[] = [];
-  const numPoints = 360; // High resolution for smooth curves
+  const numPoints = 200; // High resolution for smooth curves
 
   // Define F1-style track features with random placement
-  const numFeatures = 4 + Math.floor(Math.random() * 3); // 4-6 features
+  const numFeatures = 5 + Math.floor(Math.random() * 3); // 4-6 features
   const features: Array<{
     startAngle: number;
     endAngle: number;
