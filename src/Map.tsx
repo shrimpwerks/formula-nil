@@ -146,14 +146,17 @@ export default function Map({
     app.stage.addChild(trackGraphics);
 
     // Draw cars with tooltips
-    cars.forEach((car) => {
+    cars.forEach((car: Car) => {
       // Draw tooltip with car name
       const tooltip = new Text({
         text: car.name,
         style: {
           fontSize: 10,
           fill: 0xffffff,
+          fontFamily: 'Arial',
+          antialias: true,
         },
+        resolution: 2, // Higher resolution for crisp text
       });
 
       const tooltipPos = extendSegmentEnd(
@@ -166,9 +169,39 @@ export default function Map({
       tooltip.x = tooltipPos.x;
       tooltip.y = tooltipPos.y;
 
-      // Draw car
+      // Draw car as rectangle aligned to heading
       const carGraphics = new Graphics();
-      carGraphics.circle(car.pos.x, car.pos.y, 6).fill(car.color);
+
+      // Calculate heading from velocity
+      const heading =
+        car.velocity.length() > 0
+          ? Math.atan2(car.velocity.y, car.velocity.x)
+          : 0;
+
+      // Car dimensions
+      const carLength = 8;
+      const carWidth = 4;
+
+      // Calculate rectangle corners relative to car center
+      const halfLength = carLength / 2;
+      const halfWidth = carWidth / 2;
+
+      // Rotate rectangle points based on heading
+      const cos = Math.cos(heading);
+      const sin = Math.sin(heading);
+
+      const corners = [
+        { x: -halfLength, y: -halfWidth }, // Back left
+        { x: halfLength, y: -halfWidth }, // Front left
+        { x: halfLength, y: halfWidth }, // Front right
+        { x: -halfLength, y: halfWidth }, // Back right
+      ].map((corner) => ({
+        x: car.pos.x + corner.x * cos - corner.y * sin,
+        y: car.pos.y + corner.x * sin + corner.y * cos,
+      }));
+
+      // Draw the rectangle with transparency
+      carGraphics.poly(corners).fill({ color: car.color });
 
       app.stage.addChild(tooltip);
       app.stage.addChild(carGraphics);
