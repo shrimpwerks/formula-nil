@@ -12,6 +12,7 @@ export default function () {
   return (
     <>
       <Heading>{team?.name}</Heading>
+      <Heading level={2}>{team?.tagline}</Heading>
 
       <Heading level={2}>Drivers</Heading>
       <Table>
