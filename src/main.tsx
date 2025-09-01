@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import { Navbar, NavbarItem, NavbarSection } from "./components/navbar";
 import Driver from "./pages/Driver";
 import Drivers from "./pages/Drivers";
@@ -16,12 +16,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           Formula Nil
         </NavbarItem>
         <NavbarItem href="/formula-nil/">Race</NavbarItem>
-        <NavbarItem href="/formula-nil/teams">Teams</NavbarItem>
-        <NavbarItem href="/formula-nil/drivers">Drivers</NavbarItem>
+        <NavbarItem href="/formula-nil/#/teams">Teams</NavbarItem>
+        <NavbarItem href="/formula-nil/#/drivers">Drivers</NavbarItem>
       </NavbarSection>
     </Navbar>
 
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Race />} />
         <Route path="/teams" element={<Teams />} />
@@ -29,6 +29,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/drivers" element={<Drivers />} />
         <Route path="/driver/:id" element={<Driver />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>,
 );

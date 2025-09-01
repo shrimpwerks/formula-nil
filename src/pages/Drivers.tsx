@@ -22,7 +22,7 @@ export default function () {
         </TableHead>
         <TableBody>
           {Driver.all().map((driver) => (
-            <TableRow href={`/formula-nil/driver/${driver.id}`}>
+            <TableRow href={`/formula-nil/#/driver/${driver.id}`}>
               <TableCell className="flex items-center gap-3">
                 {driver.image && (
                   <img
