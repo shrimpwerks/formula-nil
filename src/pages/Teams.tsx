@@ -1,16 +1,22 @@
-import { Text } from '../components/text';
+import { Heading } from "../components/heading";
+import { Table, TableCell, TableRow } from "../components/table";
+import { Text } from "../components/text";
 import Team from "../db/Team";
 
 export default function Teams() {
   return (
-    <div>
-      <h1>Teams</h1>
+    <>
+      <Heading>Teams</Heading>
 
-      <ul>
+      <Table>
         {Team.all().map((team) => (
-          <li key={team.id}><Text>{team.name}</Text></li>
+          <TableRow href={`/team/${team.id}`}>
+            <TableCell>
+              <Text>{team.name}</Text>
+            </TableCell>
+          </TableRow>
         ))}
-      </ul>
-    </div>
+      </Table>
+    </>
   );
 }

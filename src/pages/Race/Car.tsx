@@ -1,5 +1,5 @@
-import Driver from "./db/Driver";
-import Vector2D from "./db/Vector2D";
+import Driver from "../../db/Driver";
+import Vector2D from "../../db/Vector2D";
 
 export function randomColor(): number {
   return Math.floor(Math.random() * 0xffffff);

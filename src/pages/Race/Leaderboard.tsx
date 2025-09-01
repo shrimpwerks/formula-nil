@@ -1,5 +1,5 @@
+import Race from "../../db/Race";
 import { Car } from "./Car";
-import Race from "./db/Race";
 
 export default function ({ cars, race }: { cars: Car[]; race: Race }) {
   return (

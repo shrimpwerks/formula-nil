@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Car, newCar } from "./Car";
-import Driver from "./db/Driver";
-import Race from "./db/Race";
-import Vector2D from "./db/Vector2D";
-import Leaderboard from "./Leaderboard";
-import Map from "./Map";
+import Driver from "../db/Driver";
+import Race from "../db/Race";
+import Vector2D from "../db/Vector2D";
+import { Car, newCar } from "./Race/Car";
+import Leaderboard from "./Race/Leaderboard";
+import Map from "./Race/Map";
 
 export default function () {
   const [cars, setCars] = useState<Car[]>([]);

@@ -1,8 +1,8 @@
 import { Application, Color, Graphics, Text } from "pixi.js";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Race from "../../db/Race";
+import Vector2D, { extendSegmentEnd } from "../../db/Vector2D";
 import { Car, updateCar } from "./Car";
-import Race from "./db/Race";
-import Vector2D, { extendSegmentEnd } from "./db/Vector2D";
 
 export default function Map({
   race,
