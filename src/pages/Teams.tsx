@@ -10,7 +10,7 @@ export default function Teams() {
 
       <Table>
         {Team.all().map((team) => (
-          <TableRow href={`/team/${team.id}`}>
+          <TableRow href={`/formula-nil/team/${team.id}`}>
             <TableCell>
               <Text>{team.name}</Text>
             </TableCell>

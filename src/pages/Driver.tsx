@@ -11,7 +11,7 @@ export default function () {
       <div className="flex items-center gap-3 mb-4">
         {driver?.image && (
           <img
-            src={`/images/${driver.image}`}
+            src={`/formula-nil/images/${driver.image}`}
             alt={driver.name}
             className="w-24 h-24 object-cover"
           />

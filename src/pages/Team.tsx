@@ -21,7 +21,7 @@ export default function () {
             <TableCell>
               {driver.image && (
                 <img
-                  src={`/images/${driver.image}`}
+                  src={`/formula-nil/images/${driver.image}`}
                   alt={driver.name}
                   className="w-12 h-12 object-cover"
                 />

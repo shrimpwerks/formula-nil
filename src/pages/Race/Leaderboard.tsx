@@ -16,7 +16,7 @@ export default function ({ cars, race }: { cars: Car[]; race: Race }) {
             <summary className="cursor-pointer flex items-center gap-2">
               {car.driver.image && (
                 <img
-                  src={`/images/${car.driver.image}`}
+                  src={`/formula-nil/images/${car.driver.image}`}
                   alt={car.driver.name}
                   className="w-12 h-12 object-cover"
                 />
@@ -25,7 +25,7 @@ export default function ({ cars, race }: { cars: Car[]; race: Race }) {
                 #{index + 1} {car.driver.name} {car.driver.surname}
               </span>
             </summary>
-            
+
             <div className="mt-2 ml-4">
               Speed: {(car.velocity.length() * 1000).toFixed(1)} <br />
               Max Speed: {(car.maxSpeed * 1000).toFixed(1)} <br />
