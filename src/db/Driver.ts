@@ -1,9 +1,3 @@
-export interface Driver {
-  name: string;
-  surname: string;
-  image?: string;
-}
-
 export const drivers: Driver[] = [
   // { name: "Jonah", image: "jonah.png" },
   { name: "Jean", surname: "Molinari", image: "john.png" },
@@ -25,3 +19,21 @@ export const drivers: Driver[] = [
   { name: "Shane", surname: "Barrantesi", image: "shane.png" },
   { name: "Grace", surname: "Giacchetti", image: "grace.png" },
 ];
+
+export default class Driver {
+  name: string;
+  surname: string;
+  image?: string;
+
+  constructor(name: string, surname: string, image?: string) {
+    this.name = name;
+    this.surname = surname;
+    this.image = image;
+  }
+
+  static all(): Driver[] {
+    return drivers.map(
+      (driver) => new Driver(driver.name, driver.surname, driver.image),
+    );
+  }
+}

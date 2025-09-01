@@ -12,12 +12,16 @@
     "pixi.js": "^8.11.0",
     "react": "18",
     "react-dom": "18",
+    "react-router-dom": "^7.8.2",
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
-    "vite": "^7",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@headlessui/react": "^2.2.7",
     "@types/react": "^18.2.18",
-    "@types/react-dom": "^18.2.18"
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.7.0",
+    "clsx": "^2.1.1",
+    "motion": "^12.23.12",
+    "vite": "^7"
   }
 }

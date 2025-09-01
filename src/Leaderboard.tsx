@@ -1,5 +1,5 @@
 import { Car } from "./Car";
-import { Race } from "./Race";
+import Race from "./db/Race";
 
 export default function ({ cars, race }: { cars: Car[]; race: Race }) {
   return (
@@ -14,17 +14,18 @@ export default function ({ cars, race }: { cars: Car[]; race: Race }) {
             key={car.id}
           >
             <summary className="cursor-pointer flex items-center gap-2">
-              {car.image && (
+              {car.driver.image && (
                 <img
-                  src={`/images/${car.image}`}
-                  alt={car.name}
+                  src={`/images/${car.driver.image}`}
+                  alt={car.driver.name}
                   className="w-12 h-12 object-cover"
                 />
               )}
               <span>
-                #{index + 1} {car.name} {car.surname}
+                #{index + 1} {car.driver.name} {car.driver.surname}
               </span>
             </summary>
+            
             <div className="mt-2 ml-4">
               Speed: {(car.velocity.length() * 1000).toFixed(1)} <br />
               Max Speed: {(car.maxSpeed * 1000).toFixed(1)} <br />

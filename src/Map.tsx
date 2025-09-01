@@ -1,10 +1,8 @@
-import { useCallback, useState, useEffect, useRef } from "react";
-import { Application, Graphics, Point, Color, Text } from "pixi.js";
-import { generateTrackPoints } from "./Track";
-import { Car } from "./Car";
-import { Race } from "./Race";
-import { updateCar } from "./Car";
-import { extendSegmentEnd, Vector2D } from "./Vector2D";
+import { Application, Color, Graphics, Text } from "pixi.js";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Car, updateCar } from "./Car";
+import Race from "./db/Race";
+import Vector2D, { extendSegmentEnd } from "./db/Vector2D";
 
 export default function Map({
   race,
@@ -119,7 +117,7 @@ export default function Map({
 
   // Initialize track and cars - run only once
   useEffect(() => {
-    const points = generateTrackPoints(centerX, centerY, radius);
+    const points = race.track()!.generateTrackPoints(centerX, centerY, radius);
     setTrackPoints(points);
     onTrackGenerated(points);
   }, []); // Empty dependency array - run only once
@@ -149,12 +147,11 @@ export default function Map({
     cars.forEach((car: Car) => {
       // Draw tooltip with car name
       const tooltip = new Text({
-        text: car.name,
+        text: car.driver.name,
         style: {
           fontSize: 10,
           fill: 0xffffff,
           fontFamily: "Arial",
-          antialias: true,
         },
         resolution: 2, // Higher resolution for crisp text
       });
@@ -171,13 +168,13 @@ export default function Map({
 
       // Draw faint grey line from car to tooltip
       const lineGraphics = new Graphics();
-      lineGraphics.setStrokeStyle({ 
-        width: 1, 
-        color: new Color(0x808080), 
-        alpha: 0.3 
+      lineGraphics.setStrokeStyle({
+        width: 1,
+        color: new Color(0x808080),
+        alpha: 0.3,
       });
       lineGraphics.moveTo(car.pos.x, car.pos.y);
-      
+
       // Connect to the center-left of the tooltip text
       const tooltipCenterY = tooltipPos.y + tooltip.height / 2;
       lineGraphics.lineTo(tooltipPos.x, tooltipCenterY);

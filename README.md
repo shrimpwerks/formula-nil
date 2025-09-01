@@ -29,7 +29,6 @@ npm run dev
     - Alea McCauletti – calculating strategist, saves fuel but never overtakes
     - Shane Barrantesi – fiery ex-jockey, team’s wildcard
 
-
 4. Mercedes-Bends GP
 
     Tagline: “Bending rules and budget caps since day one.”
@@ -39,7 +38,7 @@ npm run dev
 5. Ferraro Rosso Corse
 
     Tagline: “Glorious heritage of crashing in style.”
-    - John Molinari – hometown hero, cries on the podium… even for P8
+    - Jean Molinari – hometown hero, cries on the podium… even for P8
     - Cooper Giacchetti – sibling rivalry fuel, insists he’s faster than Grace
 
 6. Alphonso Romeo Pizza
@@ -59,4 +58,4 @@ npm run dev
 
     Tagline: “The slowest car, but at least the catering is exquisite.”
     - Jonah Giorgetti – smooth operator, but never leaves last place
-    - Test Driver: Shane Barrantesi’s cousin? No—better: rotating junior role. For now: Grace & Cooper’s cousin ‘Mario Giacchetti’ (fictional filler to balance).
+    - Ryan

@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { drivers } from "./data";
 import { Car, newCar } from "./Car";
-import Map from "./Map";
+import Driver from "./db/Driver";
+import Race from "./db/Race";
+import Vector2D from "./db/Vector2D";
 import Leaderboard from "./Leaderboard";
-import { Race } from "./Race";
-import { Vector2D } from "./Vector2D";
+import Map from "./Map";
 
 export default function () {
   const [cars, setCars] = useState<Car[]>([]);
-  const race: Race = {
-    name: "Portland International Raceway",
-  };
+  const race: Race = new Race(
+    "c1530a2b-0c9c-4313-a6a6-2e7dd354ca82",
+    "Portland International Raceway",
+    "560cb995-ea6c-41da-8e33-a5bf4d2d7cb4",
+  );
 
   // Initialize cars with track positions
   const initializeCarsOnTrack = (trackPoints: Vector2D[]) => {
@@ -20,7 +22,7 @@ export default function () {
     const startPosition = trackPoints[startPointIndex];
 
     setCars(
-      drivers.map((driver, idx) =>
+      Driver.all().map((driver, idx) =>
         newCar(idx, driver, new Vector2D(startPosition.x, startPosition.y)),
       ),
     );
@@ -28,8 +30,6 @@ export default function () {
 
   return (
     <>
-      <h1 className="text-white">Formula Nil</h1>
-
       <div className="flex">
         <div className="w-2/3">
           <Map

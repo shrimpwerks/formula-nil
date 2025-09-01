@@ -1,5 +1,5 @@
-import { Driver } from "./data";
-import { Vector2D } from "./Vector2D";
+import Driver from "./db/Driver";
+import Vector2D from "./db/Vector2D";
 
 export function randomColor(): number {
   return Math.floor(Math.random() * 0xffffff);
@@ -7,9 +7,7 @@ export function randomColor(): number {
 
 export interface Car {
   id: number;
-  name: string;
-  surname: string;
-  image?: string;
+  driver: Driver;
   color: number;
 
   acceleration: Vector2D;
@@ -43,9 +41,7 @@ export function newCar(id: number, driver: Driver, startingPos: Vector2D): Car {
 
   return {
     id: id,
-    name: driver.name,
-    surname: driver.surname,
-    image: driver.image,
+    driver: driver,
     acceleration: Vector2D.zero(),
     velocity: Vector2D.zero(),
     color: randomColor(),
@@ -65,11 +61,10 @@ function updateCarWithTarget(
   distanceToTarget: number,
   nextSegmentIdx: number,
 ): Car {
-  const directionVector = target.subtract(car.pos);
-  const trackDir = directionVector.normalized();
+  const trackDir = target.clone().subtract(car.pos).normalized();
 
   const velMag = car.velocity.length();
-  const velDir = velMag === 0 ? trackDir : car.velocity.normalized();
+  const velDir = velMag === 0 ? trackDir : car.velocity.clone().normalized();
   const alignmentDot = velDir.dot(trackDir);
   const penalty = Math.max(0, 1 - alignmentDot);
 
@@ -95,7 +90,7 @@ function updateCarWithTarget(
   newVel.y -= newVel.y * car.dragFactor * penalty;
   newVel = newVel.limitLength(car.maxSpeed);
 
-  const newPos = car.pos.add(newVel);
+  const newPos = car.pos.clone().add(newVel);
   const distanceThisFrame = car.pos.distanceTo(newPos);
   const newDistanceTraveled = car.distanceTraveled + distanceThisFrame;
 

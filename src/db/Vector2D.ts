@@ -1,4 +1,4 @@
-export class Vector2D {
+export default class Vector2D {
   x: number;
   y: number;
 
@@ -7,16 +7,26 @@ export class Vector2D {
     this.y = y;
   }
 
+  clone(): Vector2D {
+    return new Vector2D(this.x, this.y);
+  }
+
   addScalar(scalar: number): Vector2D {
-    return new Vector2D(this.x + scalar, this.y + scalar);
+    this.x += scalar;
+    this.y += scalar;
+    return this;
   }
 
   add(b: Vector2D): Vector2D {
-    return new Vector2D(this.x + b.x, this.y + b.y);
+    this.x += b.x;
+    this.y += b.y;
+    return this;
   }
 
   multiplyScalar(scalar: number): Vector2D {
-    return new Vector2D(this.x * scalar, this.y * scalar);
+    this.x *= scalar;
+    this.y *= scalar;
+    return this;
   }
 
   distanceTo(b: Vector2D): number {
@@ -32,10 +42,13 @@ export class Vector2D {
   normalized(): Vector2D {
     const len = this.length();
     if (len === 0) {
-      return new Vector2D(0, 0);
+      this.x = 0;
+      this.y = 0;
+    } else {
+      this.x /= len;
+      this.y /= len;
     }
-
-    return new Vector2D(this.x / len, this.y / len);
+    return this;
   }
 
   /// https://docs.godotengine.org/en/stable/classes/class_vector2.html#class-vector2-method-dot
@@ -47,15 +60,17 @@ export class Vector2D {
   limitLength(length: number): Vector2D {
     const mag = this.length();
     if (mag > length) {
-      return new Vector2D((this.x / mag) * length, (this.y / mag) * length);
+      this.x = (this.x / mag) * length;
+      this.y = (this.y / mag) * length;
     }
-
     return this;
   }
 
   /// https://docs.godotengine.org/en/stable/classes/class_vector2.html#class-vector2-operator-dif-vector2
   subtract(b: Vector2D): Vector2D {
-    return new Vector2D(this.x - b.x, this.y - b.y);
+    this.x -= b.x;
+    this.y -= b.y;
+    return this;
   }
 
   static zero(): Vector2D {
@@ -65,11 +80,16 @@ export class Vector2D {
   project(orthogonal: Vector2D): Vector2D {
     const dot = this.dot(orthogonal);
     const mag = orthogonal.length();
-    return new Vector2D(dot / mag, dot / mag);
+    this.x = dot / mag;
+    this.y = dot / mag;
+    return this;
   }
 
   orthogonal(): Vector2D {
-    return new Vector2D(-this.y, this.x);
+    const tempX = this.x;
+    this.x = -this.y;
+    this.y = tempX;
+    return this;
   }
 
   angleTo(other: Vector2D): number {
@@ -81,10 +101,10 @@ export class Vector2D {
   rotated(angle: number): Vector2D {
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
-    return new Vector2D(
-      this.x * cos - this.y * sin,
-      this.x * sin + this.y * cos,
-    );
+    const tempX = this.x;
+    this.x = this.x * cos - this.y * sin;
+    this.y = tempX * sin + this.y * cos;
+    return this;
   }
 }
 
