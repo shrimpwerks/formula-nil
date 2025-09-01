@@ -1,5 +1,6 @@
 import Race from "../../db/Race";
 import { Car } from "./Car";
+import { getImage } from "../../assets/images";
 
 export default function ({ cars, race }: { cars: Car[]; race: Race }) {
   return (
@@ -16,7 +17,7 @@ export default function ({ cars, race }: { cars: Car[]; race: Race }) {
             <summary className="cursor-pointer flex items-center gap-2">
               {car.driver.image && (
                 <img
-                  src={`/formula-nil/images/${car.driver.image}`}
+                  src={getImage(car.driver.image)}
                   alt={car.driver.name}
                   className="w-12 h-12 object-cover"
                 />

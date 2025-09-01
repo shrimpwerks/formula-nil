@@ -4,6 +4,7 @@ import { Table, TableCell, TableRow } from "../components/table";
 import { Text } from "../components/text";
 import Driver from "../db/Driver";
 import Team from "../db/Team";
+import { getImage } from "../assets/images";
 
 export default function () {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +22,7 @@ export default function () {
             <TableCell>
               {driver.image && (
                 <img
-                  src={`/formula-nil/images/${driver.image}`}
+                  src={getImage(driver.image)}
                   alt={driver.name}
                   className="w-12 h-12 object-cover"
                 />

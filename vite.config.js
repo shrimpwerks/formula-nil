@@ -6,4 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: '/formula-nil/',
+  build: {
+    assetsInlineLimit: 0 // Inline all assets as base64
+  }
 });

@@ -9,6 +9,7 @@ import {
 } from "../components/table";
 import { Text } from "../components/text";
 import Driver from "../db/Driver";
+import { getImage } from "../assets/images";
 
 export default function () {
   return (
@@ -26,7 +27,7 @@ export default function () {
               <TableCell className="flex items-center gap-3">
                 {driver.image && (
                   <img
-                    src={`/formula-nil/images/${driver.image}`}
+                    src={getImage(driver.image)}
                     alt={driver.name}
                     className="w-12 h-12 object-cover"
                   />
