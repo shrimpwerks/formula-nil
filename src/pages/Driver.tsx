@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-import { Heading } from "../components/heading";
 import Driver from "../db/Driver";
 import { getImage } from "../assets/images";
 
@@ -18,7 +17,7 @@ export default function () {
           />
         )}
 
-        <Heading>{driver?.fullname()}</Heading>
+        <h1>{driver?.fullname()}</h1>
       </div>
     </>
   );

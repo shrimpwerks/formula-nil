@@ -1,4 +1,6 @@
-import { Heading } from "../components/heading";
+import Driver from "../db/Driver";
+import { getImage } from "../assets/images";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -6,39 +8,36 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../components/table";
-import { Text } from "../components/text";
-import Driver from "../db/Driver";
-import { getImage } from "../assets/images";
+} from "@/components/ui/table";
 
 export default function () {
+  const navigate = useNavigate();
+
   return (
     <>
-      <Heading>Drivers</Heading>
+      <h1>Drivers</h1>
 
       <Table>
-        <TableHead>
-          <TableHeader>Name</TableHeader>
-          <TableHeader>Team</TableHeader>
-        </TableHead>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Team</TableHead>
+          </TableRow>
+        </TableHeader>
         <TableBody>
           {Driver.all().map((driver) => (
-            <TableRow href={`/formula-nil/#/driver/${driver.id}`}>
+            <TableRow onClick={() => navigate(`/driver/${driver.id}`)}>
               <TableCell className="flex items-center gap-3">
                 {driver.image && (
                   <img
                     src={getImage(driver.image)}
                     alt={driver.name}
-                    className="w-12 h-12 object-cover"
+                    className="w-10 h-10"
                   />
                 )}
-                <Text>
-                  {driver.name} {driver.surname}
-                </Text>
+                {driver.name} {driver.surname}
               </TableCell>
-              <TableCell>
-                <Text>TODO</Text>
-              </TableCell>
+              <TableCell>TODO</TableCell>
             </TableRow>
           ))}
         </TableBody>

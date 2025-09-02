@@ -30,20 +30,16 @@ export default function () {
 
   return (
     <>
-      <div className="flex">
-        <div className="w-2/3">
-          <Map
-            race={race}
-            cars={cars}
-            setCars={setCars}
-            onTrackGenerated={initializeCarsOnTrack}
-          />
-        </div>
-
-        <div className="w-1/3">
-          <Leaderboard race={race} cars={cars} />
-        </div>
+      <div className="w-2/3 mx-auto">
+        <Map
+          race={race}
+          cars={cars}
+          setCars={setCars}
+          onTrackGenerated={initializeCarsOnTrack}
+        />
       </div>
+
+      <Leaderboard race={race} cars={cars} />
     </>
   );
 }

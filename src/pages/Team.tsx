@@ -1,10 +1,8 @@
 import { useParams } from "react-router-dom";
-import { Heading } from "../components/heading";
-import { Table, TableCell, TableRow } from "../components/table";
-import { Text } from "../components/text";
 import Driver from "../db/Driver";
 import Team from "../db/Team";
 import { getImage } from "../assets/images";
+import { Table, TableCell, TableRow } from "@/components/ui/table";
 
 export default function () {
   const { id } = useParams<{ id: string }>();
@@ -12,10 +10,10 @@ export default function () {
 
   return (
     <>
-      <Heading>{team?.name}</Heading>
-      <Heading level={2}>{team?.tagline}</Heading>
+      <h1>{team?.name}</h1>
+      <h1>{team?.tagline}</h1>
 
-      <Heading level={2}>Drivers</Heading>
+      <h1>Drivers</h1>
       <Table>
         {Driver.all().map((driver) => (
           <TableRow>
@@ -29,9 +27,7 @@ export default function () {
               )}
             </TableCell>
             <TableCell>
-              <Text>
-                {driver.name} {driver.surname}
-              </Text>
+              {driver.name} {driver.surname}
             </TableCell>
           </TableRow>
         ))}

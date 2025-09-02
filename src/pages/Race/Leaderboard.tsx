@@ -4,16 +4,13 @@ import { getImage } from "../../assets/images";
 
 export default function ({ cars, race }: { cars: Car[]; race: Race }) {
   return (
-    <div className="flex flex-col gap-2">
-      <h1 className="text-white">{race.name}</h1>
+    <div className="flex flex-col gap-1">
+      <h1>{race.name}</h1>
 
       {cars
         .sort((a, b) => b.distanceTraveled - a.distanceTraveled)
         .map((car, index) => (
-          <details
-            className="text-white border-white border-1 p-1"
-            key={car.id}
-          >
+          <details className="border-1 p-1" key={car.id}>
             <summary className="cursor-pointer flex items-center gap-2">
               {car.driver.image && (
                 <img

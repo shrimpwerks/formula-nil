@@ -1,21 +1,34 @@
-import { Heading } from "../components/heading";
-import { Table, TableCell, TableRow } from "../components/table";
-import { Text } from "../components/text";
 import Team from "../db/Team";
+import { useNavigate } from "react-router-dom";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function Teams() {
+  const navigate = useNavigate();
+
   return (
     <>
-      <Heading>Teams</Heading>
+      <h1>Teams</h1>
 
       <Table>
-        {Team.all().map((team) => (
-          <TableRow href={`/formula-nil/#/team/${team.id}`}>
-            <TableCell>
-              <Text>{team.name}</Text>
-            </TableCell>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
           </TableRow>
-        ))}
+        </TableHeader>
+        <TableBody>
+          {Team.all().map((team) => (
+            <TableRow onClick={() => navigate(`/team/${team.id}`)}>
+              <TableCell>{team.name}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
       </Table>
     </>
   );
